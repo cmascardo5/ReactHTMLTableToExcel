@@ -17,6 +17,21 @@ const defaultProps = {
   buttonText: 'Download',
 };
 
+async function Do_Remove_Empty_Rows_Tbl(context, TblNameStr) {
+  var rows = context.workbook.tables.getItem(TblNameStr).rows;
+  rows.load("values");
+  await context.sync();
+  rows.items.reverse().forEach(function (row) {
+      var isEmpty = row.values[0].every(function (col) {
+          return col === "";
+      });
+      if (isEmpty) {
+          row.delete();
+      }
+  });
+  return context;
+}
+
 class ReactHTMLTableToExcel extends Component {
   constructor(props) {
     super(props);
@@ -78,6 +93,9 @@ class ReactHTMLTableToExcel extends Component {
 
       return true;
     }
+
+    //here?
+    Do_Remove_Empty_Rows_Tbl(context, table);
 
     const element = window.document.createElement('a');
     element.href =
